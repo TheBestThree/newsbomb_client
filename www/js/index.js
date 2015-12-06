@@ -1,51 +1,38 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-var app = {
-    // Application Constructor
-    initialize: function() {
-        this.bindEvents();
-    },
-    // Bind Event Listeners
-    //
-    // Bind any events that are required on startup. Common events are:
-    // 'load', 'deviceready', 'offline', and 'online'.
-    bindEvents: function() {
-        document.addEventListener('deviceready', this.onDeviceReady, false);
-    },
-    // deviceready Event Handler
-    //
-    // The scope of 'this' is the event. In order to call the 'receivedEvent'
-    // function, we must explicitly call 'app.receivedEvent(...);'
-    onDeviceReady: function() {
-        app.receivedEvent('deviceready');
-    },
-    // Update DOM on a Received Event
-    receivedEvent: function(id) {
-        var parentElement = document.getElementById(id);
-        var listeningElement = parentElement.querySelector('.listening');
-        var receivedElement = parentElement.querySelector('.received');
+(function () {
+    var url = "http://localhost:6543";
 
-        listeningElement.setAttribute('style', 'display:none;');
-        receivedElement.setAttribute('style', 'display:block;');
+    var constants = {
+        SUCCESS: "SUCCESS",
+        EXCEPTION: "EXCEPTION"
+    };
+    angular.module("login", ['ionic'])
+        .controller("EmailCtrl", ["$scope", "$http", "$log", "$ionicPopup", function ($scope, $http, $log, $ionicPopup) {
+            this.email = "max.meng@appartner.cn";
+            this.login = function () {
+                $http.get(url + "/generic/loginVerify/usernameIsValue")
+                    .success(function (data) {
+                        var status = data["status"],
+                            result = data["data"];
 
-        console.log('Received Event: ' + id);
-    }
-};
-
-app.initialize();
+                        $log.info("response status:" + status);
+                        $log.info(result);
+                        if (data["status"].toUpperCase().startsWith(constants.SUCCESS)) {
+                            $log.info("SUCCESS");
+                        }
+                        else {
+                            $log.info("ERROR");
+                            $ionicPopup.alert({
+                                title: "很抱歉，注册或登陆失败",
+                                subTitle: "错误详情：" + result[0],
+                                cssClass: "alert-pop",
+                                okText: "确认",
+                                okType: "button-positive"
+                            });
+                        }
+                    })
+                    .fail(function (data) {
+                        alert('error');
+                    });
+            };
+        }]);
+})();
